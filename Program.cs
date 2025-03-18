@@ -6,6 +6,17 @@ var connString = builder.Configuration.GetConnectionString("ShiftsLoggerDbConnec
 builder.Services.AddDbContext<ShiftsContext>(opt => opt.UseSqlServer(connString));
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!");
+app.MapGet("/shifts", async (ShiftsContext db) =>
+    await db.Shifts.ToListAsync());
+
+app.MapGet("/shifts/employee={id}", async (int id, ShiftsContext db) =>
+    await db.Shifts.Where(t => t.EmployeeId == id).ToListAsync());
+
+app.MapPost("/shifts", async (Shift shift, ShiftsContext db) =>
+{
+    db.Shifts.Add(shift);
+    await db.SaveChangesAsync();
+    return Results.Created($"/shifts/{shift.Id}", shift);
+});
 
 app.Run();
