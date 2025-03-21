@@ -4,7 +4,12 @@ using ShiftsLoggerAPI.Models;
 var builder = WebApplication.CreateBuilder(args);
 var connString = builder.Configuration.GetConnectionString("ShiftsLoggerDbConnection");
 builder.Services.AddDbContext<ShiftsContext>(opt => opt.UseSqlServer(connString));
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 var app = builder.Build();
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.MapGet("/shifts", async (ShiftsContext db) =>
     await db.Shifts.ToListAsync());
