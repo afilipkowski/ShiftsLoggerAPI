@@ -19,4 +19,27 @@ app.MapPost("/shifts", async (Shift shift, ShiftsContext db) =>
     return Results.Created($"/shifts/{shift.Id}", shift);
 });
 
+app.MapPut("/shifts/{id}", async (int id, Shift inputShift, ShiftsContext db) =>
+{
+    var shift = await db.Shifts.FindAsync(id);
+    if (shift == null) return Results.NotFound();
+
+    shift.StartTime = inputShift.StartTime;
+    shift.EndTime = inputShift.EndTime;
+    shift.Date = inputShift.Date;
+    shift.EmployeeId = inputShift.EmployeeId;
+
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+
+app.MapDelete("/shifts/{id}", async (int id, ShiftsContext db) =>
+{
+    var shift = await db.Shifts.FindAsync(id);
+    if (shift == null) return Results.NotFound();
+    db.Shifts.Remove(shift);
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+
 app.Run();
